@@ -1,20 +1,20 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const cors = require("cors"); // Import CORS
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 const app = express();
-const port = 5000;
+const port = process.env.PORT || 5000;
 
-// Hardcoded API key
-const apiKey = "AIzaSyA5E7GuZU7VxzRJ8UM5X2KMNZLz3dlmjJU";
+// Enable CORS for all origins (allow everyone)
+app.use(cors());
 
-// Initialize Gemini AI client
-const genAI = new GoogleGenerativeAI(apiKey);
-
-// Middleware
 app.use(bodyParser.json());
 
-// Function to get response from Gemini AI
+// API key should be stored in environment variables
+const apiKey = process.env.GOOGLE_API_KEY;
+const genAI = new GoogleGenerativeAI(apiKey);
+
 async function getResponse(userInput) {
   try {
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-8b" });
@@ -38,7 +38,6 @@ async function getResponse(userInput) {
   }
 }
 
-// API endpoint to handle chat requests
 app.post("/chat", async (req, res) => {
   const userInput = req.body.message;
 
@@ -56,7 +55,6 @@ app.post("/chat", async (req, res) => {
   });
 });
 
-// Start the server
 app.listen(port, () => {
   console.log(`✅ Server running at http://127.0.0.1:${port}`);
 });
